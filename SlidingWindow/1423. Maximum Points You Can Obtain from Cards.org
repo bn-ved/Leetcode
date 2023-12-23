@@ -1,0 +1,74 @@
+#+title: 1423. Maximum Points You Can Obtain From Cards
+#+author: Bedaprakash Nayak
+#+date: <2023-12-23 Sat>
+There are several cards arranged in a row, and each card has an associated number of points. The points are given in the integer array ~cardPoints~.
+In one step, you can take one card from the beginning or from the end of the row. You have to take exactly ~k~ cards.
+Your score is the sum of the points of the cards you have taken.
+Given the integer array ~cardPoints~ and the integer ~k~, return the maximum score you can obtain.
+
+#+begin_src text
+Example 1:
+Input: cardPoints = [1,2,3,4,5,6,1], k = 3
+Output: 12
+Explanation: After the first step, your score will always be 1. However, choosing the rightmost card first will maximize your total score. The optimal strategy is to take the three cards on the right, giving a final score of 1 + 6 + 5 = 12.
+
+Example 2:
+Input: cardPoints = [2,2,2], k = 2
+Output: 4
+Explanation: Regardless of which two cards you take, your score will always be 4.
+
+Example 3:
+Input: cardPoints = [9,7,7,9,7,7,9], k = 7
+Output: 55
+Explanation: You have to take all the cards. Your score is the sum of points of all cards.
+#+end_src
+
+*Constraints:*
+
+- ~1 <= cardPoints.length <= 105~
+- ~1 <= cardPoints[i] <= 104~
+- ~1 <= k <= cardPoints.length~
+
+-----
+
+** Intuition
+Given that we have to maximize the total score by obtaining cards from either front or back. The idea is to use sliding window technique but in a different fashion. We are only allowed to start contiguously from front or back.  We can start taking all the ~k~ elements sum from the front. Then rather than sliding the window from left to right we will slide our window from right to left, i.e., we will remove the ~k - 1~ element and add the ~n - 1~ element. We will repeat this process and will keep track of max score each time. Finally after ~k~ such iterations we will have our max score.
+
+** Approach
+- Initialize the ans, curr as two variabl to keep track of maximum and current maximum score.
+- Start iterating from 0 to k and add them up to have a current maximum score.
+- Now as we have the maximum score from the cards picked from front, we need to find if there are possible maximum cards which can contribute to maximum score at back.
+- Start removing the ~k - 1~ element and will add ~n - 1~ element.
+- Do this process for ~k~ iteration until our complete window shifts to back.
+- Keep track of max score in each iteration.
+- Return the max score.
+
+** Solution
+#+begin_src C
+#include <iostream>
+
+using namespace std;
+
+class Solution {
+public:
+  int maxScore(vector<int> &cardPoints, int k) {
+    int n = cardPoints.size();
+    int ans = 0;
+    int curr = 0;
+    for (int i = 0; i < k; i++) {
+      ans += cardPoints[i];
+    }
+    curr = ans;
+    for (int i = k - 1; i >= 0; i--) {
+      curr -= cardPoints[i];
+      curr += cardPoints[n - k + i];
+      ans = max(ans, curr);
+    }
+    return ans;
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: ~O(N)~
+- Space Complexity: ~O(1)~

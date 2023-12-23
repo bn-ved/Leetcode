@@ -1,4 +1,4 @@
-#+title: 901 Online Stock Span
+#+title: 901. Online Stock Span
 #+author: Bedaprakash Nayak
 #+date: <2023-12-23 Sat>
 
@@ -36,7 +36,7 @@ Implement the ~StockSpanner~ class:
 
 #+end_src
 
-**Constraints:**
+*Constraints:*
 
 - ~1 <= price <= 105~
 - At most ~10^4~ calls will be made to ~next~.
@@ -54,7 +54,7 @@ Given ~[100, 80, 60, 70, 60, 75, 85]~ the question asks us to find the span of s
 - On Day - 6, we have ~85~ as teh day's price. So we need to find teh previous highest price i.e., ~100~ so the span becomes ~6~.
 
 ** Approach
-- The approach involves the usage of **Monotonic Stack**. We will maintain a monotonic stack in a increasing order and if the top element is less than the price then remove until the price is less than the top.
+- The approach involves the usage of *Monotonic Stack*. We will maintain a monotonic stack in a increasing order and if the top element is less than the price then remove until the price is less than the top.
 - Initially we define a stack of pairs of integers, where the first integer represents the stock price, and the second integer represents the span of that price.
 - The constructor does not take any arguments.
 - The ~next()~ method of the ~StockSpanner~ class takes an integer argument ~price~, which represents the price of the stock for the current day, and returns an integer representing the span of that price, where the initial value of the span is 1.
@@ -90,3 +90,7 @@ public:
 };
 
 #+end_src
+
+*** Complexity
+- Time Complexity: ~O(N)~
+- Space Complexity: ~O(N)~

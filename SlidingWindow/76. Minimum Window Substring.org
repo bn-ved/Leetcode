@@ -1,0 +1,95 @@
+#+title: 76. Minimum Window Substring
+#+author: Bedaprakash Nayak
+#+date: <2023-12-24 Sun>
+Given two strings ~s~ and ~t~ of lengths ~m~ and ~n~ respectively, return the minimum window substring of ~s~ such that every character in ~t~ (including duplicates) is included in the window. If there is no such substring, return the empty string "".
+
+The testcases will be generated such that the answer is unique.
+
+#+begin_src text
+Example 1:
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+
+Example 2:
+Input: s = "a", t = "a"
+Output: "a"
+Explanation: The entire string s is the minimum window.
+
+Example 3:
+Input: s = "a", t = "aa"
+Output: ""
+Explanation: Both 'a's from t must be included in the window.
+Since the largest window of s only has one 'a', return empty string.
+#+end_src
+
+*Constraints:*
+- ~m == s.length~
+- ~n == t.length~
+- ~1 <= m, n <= 105~
+- ~s~ and ~t~ consist of uppercase and lowercase English letters.
+
+-----
+
+** Intuition
+The problem asks to find the minimum window in ~s~ that contains all the characters of ~t~. One way to approach this problem is to use a sliding window technique. We can maintain a window that starts from the beginnning of ~s~ and moves forward until it contains all the characters of ~t~. Once we have such a window, we can try to shrink it by moving the window's start pointer forward while still keeping all the characters of ~t~ in the window. This will give us the minimum window.
+
+** Approach
+- Initilize left, right, count and unordered map to keep track of window, total count of characters in t and map to store the frequency of each.
+- Assign the size of ~t~ to count as that are the number of characters that we need to have in our min substring and store the frequencies of each character into the map.
+- Decrease the count for each ~s[right]~ if has a frequency in map.
+- Decrease the frequency of eaxh ~s[right]~.
+- When ~count == 0~ then we have a valid window and we need to minimize it.
+- Start shrinking the window from the left.
+- Return the minimum window substring.
+
+** Solution
+#+begin_src C
+#include <climits>
+#include <iostream>
+#include <unordered_map>
+
+using namespace std;
+
+class Solution {
+public:
+  string minWindow(string s, string t) {
+    int n = s.length();
+    int count = t.length();
+    int left = 0;
+    int right = 0;
+    int start = 0;
+    int minLength = INT_MAX;
+    unordered_map<char, int> mpp;
+    for (char c : t) {
+      mpp[c]++;
+    }
+    while(right < n){
+      char c = s[right];
+      if (mpp[c] > 0) {
+        count--;
+      }
+      mpp[c]--;
+      while (count == 0) {
+        if (right - left < minLength) {
+          minLength = right - left;
+          start = left;
+        }
+
+        if (++mpp[s[left]] > 0) {
+          count++;
+        }
+        left++;
+      }
+    }
+    if (minLength != INT_MAX) {
+      return s.substr(start, minLength);
+    }
+    return "";
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: ~O(N)~
+- Space Complexity: ~O(T)~

@@ -1,0 +1,67 @@
+#+title: 159. Longest Substring With At Most Two Distinct Characters
+#+author: Bedaprakash Nayak
+#+date: <2023-12-24 Sun>
+Given a string ~s~ , find the length of the longest substring ~t~  that contains at most 2 distinct characters.
+
+#+begin_src text
+Example 1:
+Input: "eceba"
+Output: 3
+Explanation: t is "ece" which its length is 3.
+
+Example 2:
+Input: "ccaabbb"
+Output: 5
+Explanation: t is "aabbb" which its length is 5.
+#+end_src
+
+*Constraints:*
+- ~1 <= s.length <= 105~
+- ~s~ consists of English letters.
+
+-----
+
+** Intuition
+Given that we need to find the longest substring ~t~ that contains at most 2 distinct characters. We can use the sliding window technique to have a valid window containing two distinct characters and a map storing the frequency. If the size of the map is more than 2 then we need to remove the elements from left until we have two distinct characters in teh map.
+
+** Approach
+- Use a unordered map to record the occurrences of each characters, then if the number of mapping in unordered map exceeds two, one of those mappings needs to be deleted.
+- Initialize two pointers left and right to maintain a window for observation.
+- Start moving the right pointer to find window containing two distinct characters.
+- When there more than two characters then start removing characters from the left by increasing the left side.
+- Store the max valid window size in each iteration by ~right - left~.
+- Return the max length.
+
+** Solution
+#+begin_src C
+#include <iostream>
+#include <unordered_map>
+
+using namespace std;
+
+class Solution {
+public:
+  int lengthOfLongestSubstringTwoDistinct(string s) {
+    int n = s.length();
+    int left = 0;
+    int ans = 0;
+    unordered_map<char, int> mpp;
+    for (int right = 0; right < n; right++) {
+      mpp[s[right]]++;
+      while (mpp.size() > 2) {
+        mpp[s[left]]--;
+        if (mpp[s[left]] == 0) {
+          mpp.erase(s[left]);
+        }
+        left++;
+      }
+      ans = max(ans, right - left);
+    }
+    return ans;
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: ~O(N)~
+- Space Complexity: ~O(1)~

@@ -1,0 +1,67 @@
+#+title: 340. Longest Substring With At Most K Distinct Characters
+#+author: Bedaprakash Nayak
+#+date: <2023-12-24 Sun>
+Given a string ~s~ and an integer ~k~, return the length of the longest substring of ~s~ that contains at most ~k~ distinct characters.
+
+#+begin_src text
+Example 1:
+Input: s = "eceba", k = 2
+Output: 3
+Explanation: The substring is "ece" with length 3.
+
+Example 2:
+Input: s = "aa", k = 1
+Output: 2
+Explanation: The substring is "aa" with length 2.
+#+end_src
+
+*Constraints:*
+- ~1 <= s.length <= 5 * 104~
+- ~0 <= k <= 50~
+
+-----
+
+** Intuition
+Given that we need to find the longest substring ~t~ that contains at most ~k~ distinct characters. We can use the sliding window technique to have a valid window containing ~k~ distinct characters and a map storing the frequency. If the size of the map is more than ~k~ then we need to remove the elements from left until we have two distinct characters in teh map.
+
+** Approach
+- Use a unordered map to record the occurrences of each characters, then if the number of mapping in unordered map exceeds two, one of those mappings needs to be deleted.
+- Initialize two pointers left and right to maintain a window for observation.
+- Start moving the right pointer to find window containing ~k~ distinct characters.
+- When there more than ~k~ characters then start removing characters from the left by increasing the left side.
+- Store the max valid window size in each iteration by ~right - left~.
+- Return the max length.
+
+** Solution
+#+begin_src C
+#include <iostream>
+#include <unordered_map>
+
+using namespace std;
+
+class Solution {
+public:
+  int lengthOfLongestSubstringTwoDistinct(string s, int k) {
+    int n = s.length();
+    int left = 0;
+    int ans = 0;
+    unordered_map<char, int> mpp;
+    for (int right = 0; right < n; right++) {
+      mpp[s[right]]++;
+      while (mpp.size() > k) {
+        mpp[s[left]]--;
+        if (mpp[s[left]] == 0) {
+          mpp.erase(s[left]);
+        }
+        left++;
+      }
+      ans = max(ans, right - left);
+    }
+    return ans;
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: ~O(N)~
+- Space Complexity: ~O(1)~

@@ -1,0 +1,58 @@
+#+title: 215. Kth Largest Element In An Array
+#+author: Bedaprakash Nayak
+#+date:<2023-12-25 Mon>
+Given an integer array ~nums~ and an integer ~k~, return the ~kth~ largest element in the array.
+Note that it is the ~kth~ largest element in the sorted order, not the ~kth~ distinct element.
+Can you solve it without sorting?
+
+#+begin_src text
+Example 1:
+Input: nums = [3,2,1,5,6,4], k = 2
+Output: 5
+
+Example 2:
+Input: nums = [3,2,3,1,2,4,5,5,6], k = 4
+Output: 4
+#+end_src
+
+*Constraints:*
+
+- ~1 <= k <= nums.length <= 105~
+- ~-104 <= nums[i] <= 104~
+
+-----
+
+** Intuition
+Given that we need to find the ~kth~ maximum element but challange is that we cannot sort the given array. The idea here is to use a ~priority_queue~ or max heap, which will store the element based on their priority.
+
+** Approach
+- Start initializing the ~priority_queue~.
+- Iterate over the array and add those number to the priority queue.
+- To find ~kth~ maximum elements, remove ~k - 1~ elements from the priority queue.
+- Return the top of the current priority queue.
+
+** Solution
+#+begin_src C
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+class Solution {
+public:
+  int findKthLargest(vector<int> &nums, int k) {
+    priority_queue<int> pq;
+    for (int i : nums) {
+      pq.push(i);
+    }
+    while (--k) {
+      pq.pop();
+    }
+    return pq.top();
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: ~O(n)~
+- Space Complexity: ~O(n)~

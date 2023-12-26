@@ -1,0 +1,93 @@
+#+title: 23. Merge K Sorted Lists
+#+author: Bedaprakash Nayak
+#+date: <2023-12-26 Tue>
+You are given an array of ~k~ linked-lists ~lists~, each linked-list is sorted in ascending order.
+
+Merge all the linked-lists into one sorted linked-list and return it.
+
+#+begin_src text
+Example 1:
+Input: lists = [[1,4,5],[1,3,4],[2,6]]
+Output: [1,1,2,3,4,4,5,6]
+Explanation: The linked-lists are:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+merging them into one sorted list:
+1->1->2->3->4->4->5->6
+#+end_src
+
+Constraints:
+
+- ~k == lists.length~
+- ~0 <= k <= 104~
+- ~0 <= lists[i].length <= 500~
+- ~-104 <= lists[i][j] <= 104~
+- ~lists[i]~ is sorted in ascending order.
+- The sum of ~lists[i].length~ will not exceed 104.
+
+-----
+
+** Intuition
+We can solve this problem by using priority queue(min heap). We can store the smallest node of each list into the the priority queue. Every time a node is removed from the queue, the node is inserted into the next node in its list, And so on until all nodes have passed the priority queue.
+
+Since the size of the priority queue is always ~k~, and the complexity of each insertion is ~log k~, a total of ~nk~ nodes have been inserted. The time complexity is ~O(n * k * logk)~ and the space complexity is ~O(k)~.
+
+** Approach
+- We're going to use Min-Heap to solve this problem.
+- A min-heap always has the minimum most element at it's root - Each ~push()~ & ~pop()~ operation takes ~O(logn)~ time where; n = size of teh ~priority_queue~.
+- So, first we're going to insert the heads of the ~k~ sorted lists into the ~priority_queue~ - This takes ~O(klogk)~ time.
+- If the ~priority_queue~ is empty, we return NULL.
+- If not, we do the following until the ~priority_queue~ is not empty:
+  1. Remove the top element of the min-heap (which is the current minimum among all the elements in the min-heap) and add it to the result list.
+  2. If ~curr->next~ exist, we push it into the ~priority_queue~
+- Finally, we return the result list.
+
+** Solution
+#+begin_src C
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+struct ListNode {
+  int val;
+  ListNode *next;
+  ListNode() : val(0), next(nullptr) {}
+  ListNode(int x) : val(x), next(nullptr) {}
+  ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
+class Solution {
+public:
+  ListNode *mergeKLists(vector<ListNode *> &lists) {
+    auto compare = [](ListNode *a, ListNode *b) { return a->val > b->val; };
+    priority_queue<ListNode *, vector<ListNode *>, decltype(compare)> pq(
+        compare);
+    ListNode *head = new ListNode(-1);
+    ListNode *dummy = head;
+    for (auto list : lists) {
+      if (list) {
+        pq.push(list);
+      }
+    }
+    while (!pq.empty()) {
+      auto node = pq.top();
+      pq.pop();
+      // Insert the next element to the queue.
+      if (node->next) {
+        pq.push(node->next);
+      }
+      dummy->next = node;
+      dummy = node;
+    }
+    return head->next;
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: ~O(klogk)~
+- Space Complexity: ~O(k)~

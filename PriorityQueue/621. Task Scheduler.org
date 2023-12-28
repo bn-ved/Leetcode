@@ -1,0 +1,167 @@
+#+title: 621. Task Scheduler
+#+author: Bedaprakash Nayak
+#+date: <2023-12-27 Wed>
+Given a characters array ~tasks~, representing the tasks a CPU needs to do, where each letter represents a different task. Tasks could be done in any order. Each task is done in one unit of time. For each unit of time, the CPU could complete either one task or just be idle. However, there is a non-negative integer ~n~ that represents the cooldown period between two same tasks (the same letter in the array), that is that there must be at least ~n~ units of time between any two same tasks.
+
+Return the least number of units of times that the CPU will take to finish all the given tasks.
+
+#+begin_src text
+Example 1:
+Input: tasks = ["A","A","A","B","B","B"], n = 2
+Output: 8
+Explanation:
+A -> B -> idle -> A -> B -> idle -> A -> B
+There is at least 2 units of time between any two same tasks.
+
+Example 2:
+Input: tasks = ["A","A","A","B","B","B"], n = 0
+Output: 6
+Explanation: On this case any permutation of size 6 would work since n = 0.
+["A","A","A","B","B","B"]
+["A","B","A","B","A","B"]
+["B","B","B","A","A","A"]
+...
+And so on.
+
+Example 3:
+Input: tasks = ["A","A","A","A","A","A","B","C","D","E","F","G"], n = 2
+Output: 16
+Explanation:
+One possible solution is
+A -> B -> C -> A -> D -> E -> A -> F -> G -> A -> idle -> idle -> A -> idle -> idle -> A
+#+end_src
+
+*Constraints:*
+- ~1 <= task.length <= 104~
+- ~tasks[i]~ is upper-case English letter.
+- The integer ~n~ is in the range ~[0, 100]~.
+
+-----
+
+** Intuition
+The initial idea is to use the priority queue where we can store the frequencies of each task so that the highest frequency can be done first and then the other tasks. But we have to keep the cooldown period ~n~ in our mind. We see that if any task ~A~ happens, then the same task can occur after ~n~ time interval or it will repeat every ~n + 1~ times. So let's divide the arrangement into cycles, each with ~n + 1~ time slots.
+
+#+begin_src text
+Example: [A, A, A, A, B, B, C] (n = 2)
+A, _, _, A, _, _, A, _, _, A, _, _      (repeats after n + 1 time interval)
+#+end_src
+
+Thus the maximum number of those cycles would be determined by the frequency of the most frequently occurring task. In above case there'll be at max 4 such cycles.
+
+** Priority Queue Approach
+- Initialize an vector/array of frequencies.
+- Start counting all the freqencies and put them into a priority queue ~pq~.
+- Loop on ~pq~ untill it is empty.
+  - Cycle for ~n + 1~ times.
+  - Keep a track of processed tasks in the ~temp~ vector.
+  - Calculate the total time taken by the current cycle.
+  - Push back the remaining ~temp~
+  - Update the time by adding ~n + 1~ if the ~pq~ is not empty and ~t~ if the pq is empty.
+
+** Solution
+#+begin_src C
+#include <iostream>
+#include <queue>
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+  int leastInterval(vector<char> &tasks, int n) {
+    vector<int> freq(26, 0);
+    priority_queue<int> pq;
+    int time = 0;
+    for (char c : tasks) {
+      freq[c - 'A']++;
+    }
+    for (int i = 0; i < 26; i++) {
+      if (freq[i]) {
+        pq.push(freq[i]);
+      }
+    }
+    while (!pq.empty()) {
+      vector<int> temp;
+      int cycle = n + 1;
+
+      int t = 0;
+      while (cycle-- && !pq.empty()) {
+        if (pq.top() > 1) {
+          temp.push_back(pq.top() - 1);
+        }
+        pq.pop();
+        t++;
+      }
+      for (int i : temp) {
+        pq.push(i);
+      }
+      // If the pq is empty then
+      // it might not have completed teh n + 1 cycle.
+      time += pq.empty() ? t : n + 1;
+    }
+    return time;
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: ~O(nlogn)~
+- Space Complexity: ~O(n)~
+
+** Formula Approach
+Let's take
+
+#+begin_src text
+tasks= ['A','A','A','B','B','B','C','D'], n=2
+#+end_src
+
+Maxumum Frequency = 3 and Maximum occurring task = ~A, B~. Here is our possible solution
+
+#+begin_src text
+['A'->'B'->'C'] -> ['A','B','D'] ->['A','B']
+total time: 3+3+2=8
+#+end_src
+
+The cycle ~A -> B -> Other~ is repeating 2 (maximum frequency - 1) times and then ~A - B~ occurs. ~A~ and ~B~ are the maximum frequency elements which are making the cycle of length ~3(n + 1)~. So we can say that.
+
+#+begin_src text
+total time= (cycle length)*(maximum frequency-1) + number maximum frequency tasks that are left
+i.e total time=(n+1)*(max_freq-1)+count_maxfreq_task
+#+end_src
+
+In scenarios where the total time is less than the number of tasks, the minimum time required would be the number of tasks itself.
+
+** Solution
+
+#+begin_src C
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+  int leastInterval(vector<char> &tasks, int n) {
+    vector<int> freq(26, 0);
+    int max_freq = 0;
+    int max_count = 0;
+    int time = 0;
+    int size = tasks.size();
+    for (char c : tasks) {
+      freq[c - 'A']++;
+      max_freq = max(max_freq, freq[c - 'A']);
+    }
+    for (int i = 0; i < 26; i++) {
+      if (freq[i] == max_freq) {
+        max_count++;
+      }
+    }
+    time = (max_freq - 1) * (n + 1) + max_count;
+    return max(size, time);
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: ~O(n)~
+- Space Complexity: ~O(1)~

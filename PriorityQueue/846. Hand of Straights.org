@@ -1,0 +1,86 @@
+#+title: 846. Hand Of Straights
+#+author: Bedaprakash Nayak
+#+date: <2023-12-28 Thu>
+Alice has some number of cards and she wants to rearrange the cards into groups so that each group is of size ~groupSize~, and consists of ~groupSize~ consecutive cards.
+
+Given an integer array ~hand~ where ~hand[i]~ is the value written on the ~ith~ card and an integer ~groupSize~, return ~true~ if she can rearrange the cards, or ~false~ otherwise.
+
+#+brgin_src text
+Example 1:
+Input: hand = [1,2,3,6,2,3,4,7,8], groupSize = 3
+Output: true
+Explanation: Alice's hand can be rearranged as [1,2,3],[2,3,4],[6,7,8]
+
+Example 2:
+Input: hand = [1,2,3,4,5], groupSize = 4
+Output: false
+Explanation: Alice's hand can not be rearranged into groups of 4.
+#+end_src
+
+*Constraints:*
+- ~1 <= hand.length <= 104~
+- ~0 <= hand[i] <= 109~
+- ~1 <= groupSize <= hand.length~
+
+-----
+
+** Intuition
+We can use Min Heap(Priority Queue), where we can store all the elements in the heap first and take the elements which are just greater than the current element. We can follow this process to create our groups. If the current group size does not meet the required ~groupSize~ then we can return ~false~ otherwise =true=.
+
+** Approach
+- Initialize the Min Heap(Priority Queue).
+- Start storing the elements one by one.
+- Now untill =pq= is empty.
+  - Initialize a =rem= vector to store the element which can not be part of the =cycle=
+  - Remove the =prev= element assign the =cycle= value to be =groupSize - 1=
+  - Now start adding each element to the cycle which are just greater than the =prev=
+  - Push the elments which are not to be included in the current cycle.
+- Push back all the elements to the =pq= back.
+- If the =cycle= is not zero then that mean current group does not meet the requirements to have =groupSize= number of elements. Thus return =false=.
+- After all processing return =true= as we can arrange the given elements into =groupSize= groups.
+
+** Solution
+
+#+begin_src C++
+#include <queue>
+
+using namespace std;
+
+class Solution {
+public:
+  bool isNStraightHand(vector<int> &hand, int groupSize) {
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (int h : hand) {
+      pq.push(h);
+    }
+    while (!pq.empty()) {
+      vector<int> rem;
+
+      int prev = pq.top();
+      pq.pop();
+
+      // As we already taking the first element as prev.
+      int cycle = groupSize - 1;
+
+      while (!pq.empty() && cycle) {
+        // If consecutive then add to the cycle.
+        if (pq.top() == prev + 1) {
+          prev = pq.top();
+          cycle--;
+        } else {
+          rem.push_back(pq.top());
+        }
+        pq.pop();
+      }
+      for (auto x : rem) {
+        pq.push(x);
+      }
+      // If the cycle is not complete.
+      if (cycle) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+#+end_src

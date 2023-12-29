@@ -5,7 +5,7 @@ Alice has some number of cards and she wants to rearrange the cards into groups 
 
 Given an integer array ~hand~ where ~hand[i]~ is the value written on the ~ith~ card and an integer ~groupSize~, return ~true~ if she can rearrange the cards, or ~false~ otherwise.
 
-#+brgin_src text
+#+begin_src text
 Example 1:
 Input: hand = [1,2,3,6,2,3,4,7,8], groupSize = 3
 Output: true
@@ -30,11 +30,11 @@ We can use Min Heap(Priority Queue), where we can store all the elements in the 
 ** Approach
 - Initialize the Min Heap(Priority Queue).
 - Start storing the elements one by one.
-- Now untill =pq= is empty.
+- Now until =pq= is empty.
   - Initialize a =rem= vector to store the element which can not be part of the =cycle=
   - Remove the =prev= element assign the =cycle= value to be =groupSize - 1=
   - Now start adding each element to the cycle which are just greater than the =prev=
-  - Push the elments which are not to be included in the current cycle.
+  - Push the elements which are not to be included in the current cycle.
 - Push back all the elements to the =pq= back.
 - If the =cycle= is not zero then that mean current group does not meet the requirements to have =groupSize= number of elements. Thus return =false=.
 - After all processing return =true= as we can arrange the given elements into =groupSize= groups.

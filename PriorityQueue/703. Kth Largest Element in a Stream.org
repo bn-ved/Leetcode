@@ -1,0 +1,91 @@
+#+title: 703. Kth Largest Element In A Stream
+#+author: Bedaprakash Nayak
+#+date: <2023-12-29 Fri>
+Design a class to find the =kth= largest element in a stream. Note that it is the =kth= largest element in the sorted order, not the =kth= distinct element.
+
+Implement =KthLargest= class:
+
+- =KthLargest(int k, int[] nums)= Initializes the object with the integer =k= and the stream of integers =nums=.
+- =int add(int val)= Appends the integer =val= to the stream and returns the element representing the =kth= largest element in the stream.
+
+#+begin_src
+Example 1:
+
+Input
+["KthLargest", "add", "add", "add", "add", "add"]
+[[3, [4, 5, 8, 2]], [3], [5], [10], [9], [4]]
+Output
+[null, 4, 5, 5, 8, 8]
+
+Explanation
+KthLargest kthLargest = new KthLargest(3, [4, 5, 8, 2]);
+kthLargest.add(3);   // return 4
+kthLargest.add(5);   // return 5
+kthLargest.add(10);  // return 5
+kthLargest.add(9);   // return 8
+kthLargest.add(4);   // return 8
+#+end_src
+
+*Constraints:*
+
+- ~1 <= k <= 104~
+- ~0 <= nums.length <= 104~
+- ~-104 <= nums[i] <= 104~
+- ~-104 <= val <= 104~
+- At most =104= calls will be made to add.
+- It is guaranteed that there will be at least =k= elements in the array when you search for the =kth= element.
+
+-----
+
+** Intuition
+The problem can be solved using heap(priority_queue). we will maintain a minHeap of size =k=, it represents that there are =k= elements that are larger than the top element. The problems like "top k", "Kth Largest", "Top k Frequency". These type of questions can be solved by priority_queue.
+
+If we want to add an element to the min heap in which there are already having =k= elements, we need to check whether the element is greater than the top element of min heap. This is because,
+
+#+begin_src
+For example we have min heap [1, 3, 5, 7, 8, 9, 10]
+Now the fourth largest number is 7.
+
+Now if we add any number less than 7, [1, 3, 5, x, 7, 8, 9, 10]. Then still 7 is the fourth largest element.
+Thus if there is a greater element than the top element then we need to pop out the top element and push the new element.
+#+end_src
+
+** Approach
+- Initialize a global min heap and =k= value to define our stack size.
+- Now insert all the given elements to the queue and then shrink the queue size to =k=
+- =add(int val)= in this method push the new element to the queue and shrink the size of the queue to =k=.
+- Finally return the =pq.top()= element as the kth largest value.
+
+** Solution
+
+#+begin_src C++
+#include <functional>
+#include <queue>
+#include <vector>
+
+using namespace std;
+
+class KthLargest {
+  priority_queue<int, vector<int>, greater<>> pq;
+  int k;
+
+public:
+  KthLargest(int k, vector<int> &nums) : k(k), pq(begin(nums), end(nums)) {
+    while (pq.size() > k) {
+      pq.pop();
+    }
+  }
+
+  int add(int val) {
+    pq.push(val);
+    if (pq.size() > k) {
+      pq.pop();
+    }
+    return pq.top();
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: =O(nlogk)=
+- Space Complexity: =O(k)=

@@ -1,0 +1,122 @@
+#+title: 355. Design Twitter
+#+author: Bedaprakash Nayak
+#+date: <2023-12-29 Fri>
+Design a simplified version of Twitter where users can post tweets, follow/unfollow another user, and is able to see the =10= most recent tweets in the user's news feed.
+
+Implement the =Twitter= class:
+
+- =Twitter()= Initializes your twitter object.
+- =void postTweet(int userId, int tweetId)= Composes a new tweet with ID =tweetId= by the user =userId=. Each call to this function will be made with a unique =tweetId=.
+- =List<Integer> getNewsFeed(int userId)= Retrieves the =10= most recent tweet IDs in the user's news feed. Each item in the news feed must be posted by users who the user followed or by the user themself. Tweets must be ordered from most recent to least recent.
+- =void follow(int followerId, int followeeId)= The user with ID =followerId= started following the user with ID =followeeId=.
+- =void unfollow(int followerId, int followeeId)= The user with ID =followerId= started unfollowing the user with ID =followeeId=.
+
+#+begin_src C++
+Example 1:
+
+Input
+["Twitter", "postTweet", "getNewsFeed", "follow", "postTweet", "getNewsFeed", "unfollow", "getNewsFeed"]
+[[], [1, 5], [1], [1, 2], [2, 6], [1], [1, 2], [1]]
+Output
+[null, null, [5], null, null, [6, 5], null, [5]]
+
+Explanation
+Twitter twitter = new Twitter();
+twitter.postTweet(1, 5); // User 1 posts a new tweet (id = 5).
+twitter.getNewsFeed(1);  // User 1's news feed should return a list with 1 tweet id -> [5]. return [5]
+twitter.follow(1, 2);    // User 1 follows user 2.
+twitter.postTweet(2, 6); // User 2 posts a new tweet (id = 6).
+twitter.getNewsFeed(1);  // User 1's news feed should return a list with 2 tweet ids -> [6, 5]. Tweet id 6 should precede tweet id 5 because it is posted after tweet id 5.
+twitter.unfollow(1, 2);  // User 1 unfollows user 2.
+twitter.getNewsFeed(1);  // User 1's news feed should return a list with 1 tweet id -> [5], since user 1 is no longer following user 2.
+#+end_src
+
+*Constraints:*
+
+- ~1 <= userId, followerId, followeeId <= 500~
+- ~0 <= tweetId <= 104~
+- All the tweets have unique IDs.
+- At most =3 * 104= calls will be made to =postTweet=, =getNewsFeed=, =follow=, and =unfollow=.
+
+-----
+
+** Intuition
+The Idea is to maintain two =unordered_map= to keep track of =followings= and =tweets=.
+- =following= where the key is the =userId= and a set of =users= that user follows.
+- =tweets= where the key is =userId= and a list of =pair= of =time, tweet=.
+- To return the last =10= recent =feeds= for that user. We will use a =priority_queue= to maintain all the tweets for that user and the their followings. Then we will top most =10= feeds.
+
+** Approach
+- Initialize the =time= variable to store the time for each tweet.
+- Initialize =following= map which stores the set of the followings for that user.
+- Initialize =tweets= map which will store the tweets and the time of the tweet for that user.
+- =postTweet(int userId, int tweetId)= increase the =time= value and insert the tweet into the =tweets= map.
+- =vector<int> getNewsFeed(int userId)=
+  - Initialize a vector =feeds= to return 10 recent tweets.
+  - Initialize a priority_queue to store all the tweets from the user.
+  - Start iterating over the tweets map and push each tweet into the =pq=.
+  - Then Start iterating over the following tweets and push them into the =pq=.
+  - Finally cycle for 10 times or until there is no elements in =pq=.
+  - Return the =feeds= vector.
+- =follow(int followerId, int followeeId)= insert the following details into the following map.
+- =unfollow(int followerId, int followeeId)= erase the following details into the following map.
+
+** Solution
+
+#+begin_src C++
+#include <queue>
+#include <set>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+using namespace std;
+
+class Twitter {
+public:
+  int time;
+  // Define a following map to store
+  // the following for each user.
+  unordered_map<int, set<int>> following;
+
+  // Define a tweets map to store
+  // the tweets by the user.
+  unordered_map<int, vector<pair<int, int>>> tweets;
+
+  Twitter() { time = 0; }
+
+  void postTweet(int userId, int tweetId) {
+    tweets[userId].push_back({time++, tweetId});
+  }
+
+  vector<int> getNewsFeed(int userId) {
+    vector<int> feeds;
+    priority_queue<pair<int, int>> pq;
+    for (auto tweet : tweets[userId]) {
+      pq.push(tweet);
+    }
+    for (auto follower : following[userId]) {
+      for (auto tweet : tweets[follower]) {
+        pq.push(tweet);
+      }
+    }
+    for (int i = 0; i < 10 && !pq.empty(); i++) {
+      feeds.push_back(pq.top().second);
+      pq.pop();
+    }
+    return feeds;
+  }
+
+  void follow(int followerId, int followeeId) {
+    following[followerId].insert(followeeId);
+  }
+
+  void unfollow(int followerId, int followeeId) {
+    following[followerId].erase(followeeId);
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: =O(n^2)=
+- Space Complexity: =O(n)=

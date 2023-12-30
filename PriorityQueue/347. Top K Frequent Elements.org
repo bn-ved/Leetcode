@@ -1,0 +1,68 @@
+#+title: 347. Top K Frequent Elements
+#+author: Bedaprakash Nayak
+#+date: <2023-12-30 Sat>
+Given an integer array =nums= and an integer =k=, return the =k= most frequent elements. You may return the answer in any order.
+
+#+begin_src
+Example 1:
+Input: nums = [1,1,1,2,2,3], k = 2
+Output: [1,2]
+
+Example 2:
+Input: nums = [1], k = 1
+Output: [1]
+#+end_src
+
+*Constraints:*
+
+- ~1 <= nums.length <= 105~
+- ~-104 <= nums[i] <= 104~
+- =k= is in the range =[1, the number of unique elements in the array]=.
+- It is guaranteed that the answer is unique.
+
+-----
+
+** Intuition
+The intuition to solve the problem is to use a map to store the frequencies of each number. Then store those elements into a heap, Which will keep them in a sorted order.
+
+** Approach
+- Initialize =unordered_map=, =priority_queu= and =ans= vector.
+- Iterate over the given array to keep track of the frequencies of each elements.
+- Take those elements and add them into the priority_queue as a pair ={x.second, x.first}= where it will be in the sorted order.
+- Now remove the top =k= elements and add them into the =ans= vector.
+- Return =ans= vector.
+
+** Solution
+
+#+begin_src C
+#include <queue>
+#include <unordered_map>
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+  vector<int> topKFrequent(vector<int> &nums, int k) {
+    unordered_map<int, int> mpp;
+    priority_queue<pair<int, int>> pq;
+    vector<int> ans;
+
+    for (int n : nums) {
+      mpp[n]++;
+    }
+    for (auto x : mpp) {
+      pq.push({x.second, x.first});
+    }
+    while (k--) {
+      ans.push_back(pq.top().second);
+      pq.pop();
+    }
+    return ans;
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: =O(n + mlogk)=
+- Space Complexity: =O(n + k)=

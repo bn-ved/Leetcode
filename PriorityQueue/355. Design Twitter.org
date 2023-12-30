@@ -11,7 +11,7 @@ Implement the =Twitter= class:
 - =void follow(int followerId, int followeeId)= The user with ID =followerId= started following the user with ID =followeeId=.
 - =void unfollow(int followerId, int followeeId)= The user with ID =followerId= started unfollowing the user with ID =followeeId=.
 
-#+begin_src
+#+begin_src C++
 Example 1:
 
 Input

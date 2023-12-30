@@ -26,7 +26,7 @@ Output: [1]
 The intuition to solve the problem is to use a map to store the frequencies of each number. Then store those elements into a heap, Which will keep them in a sorted order.
 
 ** Approach
-- Initialize =unordered_map=, =priority_queu= and =ans= vector.
+- Initialize =unordered_map=, =priority_queue= and =ans= vector.
 - Iterate over the given array to keep track of the frequencies of each elements.
 - Take those elements and add them into the priority_queue as a pair ={x.second, x.first}= where it will be in the sorted order.
 - Now remove the top =k= elements and add them into the =ans= vector.

@@ -1,0 +1,94 @@
+#+title: 135. Candy
+#+author: Bedaprakash Nayak
+#+date: <2024-01-01 Mon>
+There are =n= children standing in a line. Each child is assigned a rating value given in the integer array =ratings=.
+
+You are giving candies to these children subjected to the following requirements:
+
+- Each child must have at least one candy.
+- Children with a higher rating get more candies than their neighbors.
+Return the minimum number of candies you need to have to distribute the candies to the children.
+
+#+begin_src text
+Example 1:
+Input: ratings = [1,0,2]
+Output: 5
+Explanation: You can allocate to the first, second and third child with 2, 1, 2 candies respectively.
+
+Example 2:
+Input: ratings = [1,2,2]
+Output: 4
+Explanation: You can allocate to the first, second and third child with 1, 2, 1 candies respectively.
+The third child gets 1 candy because it satisfies the above two conditions.
+#+end_src
+
+*Constraints:*
+
+- ~n == ratings.length~
+- ~1 <= n <= 2 * 104~
+- ~0 <= ratings[i] <= 2 * 104~
+
+-----
+
+** Intuition
+To ensure that each child with a higher rating than their neighbor gets more candies while maintaining the minimum amount of candies required,
+we will have to iterate twice over the ratings array, first from left end and then from right end.
+
+** Approach
+1. Initialization:
+
+- Initialize an array =ans= to store the number of candies each child will receive. We will initialise it to 1 by default.
+
+2. First Pass (Left to Right):
+
+- Iterate through the ratings from the second child to the last.
+- Compare each child's rating with the previous child's rating.
+- If the current child has a higher rating than the previous one, give the current child more candies than the previous child (~ans[i] = ans[i-1] + 1~). Otherwise, leave the number of candies the same.
+
+3. Second Pass (Right to Left):
+
+- Iterate through the ratings from the second last child to the first.
+- Compare each child's rating with the next child's rating.
+- If the current child has a higher rating than the next one and the number of candies it has is not already greater than the next child's count plus 1, update the current child's count of candies to be one more than the next child (~ans[i] = max(ans[i], ans[i+1] + 1~)).
+
+4. Total Candies Calculation:
+
+- Sum up all the values in the =ans= array. The sum represents the total number of candies to be distributed.
+
+** Solution
+
+#+begin_src C
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+  int candy(vector<int> &ratings) {
+    int n = ratings.size();
+    int totalCandies = 0;
+    vector<int> candies(n, 1);
+
+    for (int i = 1; i < n; i++) {
+      if (ratings[i] > ratings[i - 1]) {
+        candies[i] = candies[i - 1] + 1;
+      }
+    }
+
+    for (int i = n - 2; i >= 0; i--) {
+      if (ratings[i] > ratings[i + 1]) {
+        candies[i] = max(candies[i], candies[i + 1] + 1);
+      }
+    }
+
+    for (int candy : candies) {
+      totalCandies += candy;
+    }
+    return totalCandies;
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: =O(n)=
+- Space Complexity: =O(n)=

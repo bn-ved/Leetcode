@@ -1,0 +1,95 @@
+#+title: 57. Insert Interval
+#+author: Bedaprakash Nayak
+#+date: <2024-01-01 Mon>
+You are given an array of non-overlapping intervals =intervals= where ~intervals[i] = [starti, endi]~ represent the start and the end of the =ith= interval and =intervals= is sorted in ascending order by =starti=. You are also given an interval ~newInterval = [start, end]~ that represents the start and end of another interval.
+
+Insert =newInterval= into =intervals= such that =intervals= is still sorted in ascending order by =starti= and =intervals= still does not have any overlapping intervals (merge overlapping intervals if necessary).
+
+Return =intervals= after the insertion.
+
+#+begin_src text
+Example 1:
+Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
+Output: [[1,5],[6,9]]
+
+Example 2:
+Input: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+Output: [[1,2],[3,10],[12,16]]
+Explanation: Because the new interval [4,8] overlaps with [3,5],[6,7],[8,10].
+#+end_src
+
+*Constraints*:
+
+- ~0 <= intervals.length <= 104~
+- ~intervals[i].length == 2~
+- ~0 <= starti <= endi <= 105~
+- =intervals= is sorted by =starti= in ascending order.
+- ~newInterval.length == 2~
+- ~0 <= start <= end <= 105~
+
+-----
+
+** Intuition
+Intuition behind this problem is to compare the =start= and =end= of the =newInterval= with each interval in the given array. If there is any overlapping interval then create a new interval by taking the =start= as the min and =end= as the max.
+
+** Approach
+
+#+begin_src C++
+intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+#+end_src
+
+First we check , newInterval[1] < interval[i][0] , 8<1,which is not true. Now we check interval[i][1] < newInterval[0] , i.e , if current ending is less than new start , we  can then add current to result.
+
+At iteration 2,
+
+First we check , newInterval[1] < interval[i][0] , 8<3,which is not true. Now we check interval[i][1] < newInterval[0] , i.e , 5<4 , not true. That means we can merge, newInterval now becomes 3,8
+
+At iteration 3,
+
+First we check , newInterval[1] < interval[i][0] , 8<6,which is not true. Now we check interval[i][1] < newInterval[0] , i.e , 7<3 , not true. That means we can merge, newInterval now becomes 3,8.
+
+At iteration 4,
+
+First we check , newInterval[1] < interval[i][0] , 8<8,which is not true. Now we check interval[i][1] < newInterval[0] , i.e , 10<3 , not true. That means we can merge, newInterval now becomes 3,10
+
+At iteration 5,
+
+First we check , newInterval[1] < interval[i][0] , 10<12,which is true. So we add 3,10 to the result.  Then we copy the rest of the intervals to the result and return.
+
+** Solution
+
+#+begin_src C++
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+  vector<vector<int>> insert(vector<vector<int>> &intervals,
+                             vector<int> &newInterval) {
+    int n = intervals.size();
+    vector<vector<int>> ans;
+
+    for (int i = 0; i < n; i++) {
+      if (newInterval[1] < intervals[i][0]) {
+        ans.push_back(newInterval);
+        for (; i < n; i++) {
+          ans.push_back(intervals[i]);
+        }
+        return ans;
+      } else if (intervals[i][1] < newInterval[0]) {
+        ans.push_back(intervals[i]);
+      } else {
+        newInterval[0] = min(newInterval[0], intervals[i][0]);
+        newInterval[1] = max(newInterval[1], intervals[i][1]);
+      }
+    }
+    ans.push_back(newInterval);
+    return ans;
+  }
+};
+#+end_src
+
+*** Complexity
+- Time Complexity: =O(n)=
+- Space Complexity: =O(n)=

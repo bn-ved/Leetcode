@@ -27,6 +27,13 @@ Output: [[4,3,2,1]]
 Explanation: All elements of the array are distinct, so we can keep all of them in the first row of the 2D array.
 #+end_src
 
+*Constraints:*
+
+- ~1 <= nums.length <= 200~
+- ~1 <= nums[i] <= nums.length~
+
+-----
+
 ** Intuition
 A map can be used to track all the frequencies for each number. As each matrix row will have distinct numbers then we will start adding the =nums= to rows and then those rows to =matrix=.
 
